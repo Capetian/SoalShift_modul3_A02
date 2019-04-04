@@ -64,7 +64,7 @@ Pada suatu hari ada orang yang ingin berjualan 1 jenis barang secara private, di
     
     server_fd = socket(AF_INET, SOCK_STREAM, 0);                                        // Buat socket ke internet dengan koneksi tcp
     setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));   
-    ibind(server_fd, (struct sockaddr *)&address, (socklen_t) addrlen);                 // bind socket sesuai address dan prot yg diinginkan
+    ibind(server_fd, (struct sockaddr *)&address, (socklen_t) addrlen);                 // bind socket sesuai address & port yg diinginkan
     listen(server_fd, 1);                                                               // terima 1 koneksi saja
     
   Buatlah nilai stok yang dijadikan shared memory untuk mensinkronisasi nilai stok di server pembeli dan penjual
