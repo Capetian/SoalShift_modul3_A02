@@ -26,7 +26,7 @@ Contoh:
     unsigned long long  res = 1;
     for( i = n; i > 1; i--) res = res * i;
 ```
-  Thread akan di-halt sampai mutex yang di inisialisasi sebagai -1. Jika nilai mutex sama dengan nilai index thread, maka thread akan   dijalankan kembali
+  Thread akan di-halt dengan mutex yang di inisialisasi sebagai -1. Jika nilai mutex sama dengan nilai index thread, maka thread akan   dijalankan kembali
 ```
     int mutex = -1;
     ....
