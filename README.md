@@ -67,10 +67,10 @@ Pada suatu hari ada orang yang ingin berjualan 1 jenis barang secara private, di
     ibind(server_fd, (struct sockaddr *)&address, (socklen_t) addrlen);                 // bind socket sesuai address dan prot yg diinginkan
     listen(server_fd, 1);                                                               // terima 1 koneksi saja
     
-  Buatlah nilai stok yang dijadikan shared memory untuk mensinkronisasi nilai stok di server pembeli dan ppenjual
+  Buatlah nilai stok yang dijadikan shared memory untuk mensinkronisasi nilai stok di server pembeli dan penjual
   
+      int *stock;
       key_t key = 1234;
-
       int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666);
       stock = shmat(shmid, NULL, 0);
     
