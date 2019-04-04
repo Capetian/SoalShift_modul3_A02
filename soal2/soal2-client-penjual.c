@@ -5,14 +5,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#define PORT 8080
+#define PORT 4040
   
 int main(int argc, char const *argv[]) {
     struct sockaddr_in address;
-    int sock = 0, valread;
+    int sock = 0, reader;
     struct sockaddr_in serv_addr;
-    const char *hello = argv[argc -1];
-    char buffer[1024] = {0};
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\n Socket creation error \n");
         return -1;
@@ -32,10 +30,23 @@ int main(int argc, char const *argv[]) {
         printf("\nConnection Failed \n");
         return -1;
     }
+    char message[1024] = "Establishing Connection.";
+    char mailbox[1024] = {0};
+    send(sock , message , strlen(message) , 0 );
+    read( sock , mailbox, 1024);
+    printf("%s\n", mailbox );
+    if (strstr(mailbox,"Busy")) 
+        return 0;
+    while(1){
+            
+        memset(mailbox,0,1024);
+        memset(message,0,1024);
+        scanf("%s", message);
+        send(sock , message , strlen(message) , 0 );
+        if (strcmp(message,"exit") == 0)
+            break;
 
-    send(sock , hello , strlen(hello) , 0 );
-    valread = read( sock , buffer, 1024);
-    printf("%s\n",buffer );
+    }
     close(sock);
     return 0;
 }
