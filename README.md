@@ -173,7 +173,7 @@ __Dengan Syarat__ :
 
 
 ### Jawab :
-Agar thread dijalankan secars bersamaan, digunkan mutex untuk menunggu kedua thread selesai untuk melakukan langkan selanjutnya.
+Agar thread dijalankan secara bersamaan, digunkan mutex untuk menunggu kedua thread selesai untuk melakukan langkah selanjutnya.
 
         int mutex = 0
         ....
