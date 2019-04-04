@@ -26,18 +26,18 @@ Contoh:
     unsigned long long  res = 1;
     for( i = n; i > 1; i--) res = res * i;
 ```
-  Thread akan di-halt dengan mutex yang di inisialisasi sebagai -1. Jika nilai mutex sama dengan nilai index thread, maka thread akan   dijalankan kembali
+  Thread akan di-halt dengan semaphore yang di inisialisasi sebagai -1. Jika nilai mutex sama dengan nilai index thread, maka thread akan   dijalankan kembali
 ```
-    int mutex = -1;
+    int smp = -1;
     ....
     void* factorial( void* args)
     ....
-    while(mutex != n){}
+    while(smp != n){}
 ```
 
   Naikkan nilai mutex dan lakukan join thread sesuai urutan.
 
-	for ( mutex = 0; mutex < 100; mutex++){ pthread_join (tid[mutex], NULL);}
+	for ( smp = 0; smp < MaxVal; mutex++){ pthread_join (tid[smp], NULL);}
 
 ## Soal 2 
 Pada suatu hari ada orang yang ingin berjualan 1 jenis barang secara private, dia memintamu membuat program C dengan spesifikasi sebagai berikut:
@@ -80,14 +80,30 @@ Pada suatu hari ada orang yang ingin berjualan 1 jenis barang secara private, di
         pthread_create(&tid[0], NULL, &conn, (void*) &new_socket);
         ...
     void* conn(void* args) {
-          int valread, new_socket = *(int*) args;
-          char buffer[1024] = {0};                                                   // buffer untuk menyimpan pesan dari client
-          valread = read( new_socket , buffer, 1024);                                // baca pesan dari client
+          int reader, new_socket = *(int*) args;
+          char mailbox[1024] = {0};                                                 // buffer untuk menyimpan pesan dari client
+          reader = read( new_socket , buffer, 1024);                                // baca pesan dari client
           ...
           int temp = *stock;
-          char *hello = temp > 0 ? "transaksi berhasil" : "transaksi gagal";         // buffer untuk menyimpan pesan ke client
-          send(new_socket , hello , strlen(hello) , 0 );                             // kirim pesan ke client
-          
+          char *message = temp > 0 ? "transaksi berhasil" : "transaksi gagal";         // buffer untuk menyimpan pesan ke client
+          send(new_socket , message , strlen(message) , 0 );                           // kirim pesan ke client
+    
+    
+   Agar hanya satu klien yang dilayani, satu klien akan dihungkan sedangkan lainnya di-reject.
+   
+       int active = 0;
+       ...
+       if (active == 0) {
+            pthread_create(&tid[0], NULL, &conn, (void*) &conn_sock);
+            active++;
+        }
+        else
+        {
+            char busy[1024] = "Server Busy\n";
+            send(conn_sock , busy , strlen(busy) , 0 );
+            close(conn_sock);
+	}
+   
    
    #### Server Pembeli
    
@@ -96,11 +112,11 @@ Pada suatu hari ada orang yang ingin berjualan 1 jenis barang secara private, di
         ....
         else if (strcmp(buffer,"beli") == 0) {
             int temp = *stock;
-            char *hello = temp > 0 ? "transaksi berhasil" : "transaksi gagal";    // Jika stock < 0, transaksi gagal
-            if (strstr(hello, "berhasil")) {                                      // Jika stock > 0, transaksi berhasil dan stock berkurang
+            char *message = temp > 0 ? "transaksi berhasil" : "transaksi gagal";  // Jika stock < 0, transaksi gagal
+            if (strstr(message, "berhasil")) {                                    // Jika stock > 0, transaksi berhasil dan stock berkurang
                 *stock= *stock - 1;
             }
-            send(new_socket , hello , strlen(hello) , 0 );
+            send(new_socket , hello , strlen(message) , 0 );
    
   #### Server Penjual
     
@@ -123,11 +139,21 @@ Pada suatu hari ada orang yang ingin berjualan 1 jenis barang secara private, di
     inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr);             // tentukan alamat yang diinginkan
     connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr));  // buat koneksi ke server
 
+  Check status server.
+    
+	char message[1024] = "Establishing Connection.";		
+	char mailbox[1024] = {0};
+	send(sock , message , strlen(message) , 0 );		// coba menghubungi server
+	read( sock , mailbox, 1024);
+	printf("%s\n", mailbox );
+	if (strstr(mailbox,"Busy")) 				// jika dijawab "Busy" maka hentikan program.
+	return 0;
+	
   Terima pesan dan kirim pesan ke server.
     
-     send(sock , hello , strlen(hello) , 0 );      // kirim pesan ke server, jika client pembeli, maka "beli" akan dikirimkan
+     send(sock , message, strlen(message) , 0 );      // kirim pesan ke server, jika client pembeli, maka "beli" akan dikirimkan
                                                    // jika client penjual, maka "tambah" akan dikirimkan
-     valread = read( sock , buffer, 1024);         // baca pesan dari server untuk mengetahui keberhasilan transaksi
+     reader = read( sock , mailbox, 1024);         // baca pesan dari server untuk mengetahui keberhasilan transaksi
 
 
 ## Soal 3
@@ -145,7 +171,7 @@ Agmal dan Iraj merupakan 2 sahabat yang sedang kuliah dan hidup satu kostan, say
             Agmal WakeUp_Status = 75 
             Iraj Spirit_Status = 30
     - “Agmal Ayo Bangun” menambah WakeUp_Status Agmal sebesar 15 point
-    - “Iraj Ayo Tidur” mengurangi Spirit_Status Iraj sebanyak 20 point
+    - “Iraj Ayo Tidur” mengurangi Spirit_Sotatus Iraj sebanyak 20 point
 - Terdapat Kasus yang unik dimana:
     - Jika Fitur “Agmal Ayo Bangun” dijalankan sebanyak 3 kali, maka Fitur “Iraj Ayo Tidur” Tidak bisa dijalankan selama 10 detik (Dengan mengirim pesan ke sistem “Fitur Iraj Ayo Tidur disabled 10 s”)
     - Jika Fitur  “Iraj Ayo Tidur” dijalankan sebanyak 3 kali, maka Fitur “Agmal Ayo Bangun” Tidak bisa dijalankan selama 10 detik (Dengan mengirim pesan ke sistem “Agmal Ayo Bangun disabled 10 s”)
