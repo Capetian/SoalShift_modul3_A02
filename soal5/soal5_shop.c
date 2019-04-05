@@ -23,7 +23,7 @@ int mygetch(void)
 
 void main()
 {
-        key_t key = 1234;
+        key_t key = 969;
         int *food_stock;
 	    char choice;
         int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666);
