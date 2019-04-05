@@ -183,6 +183,77 @@ Agmal dan Iraj merupakan 2 sahabat yang sedang kuliah dan hidup satu kostan, say
 
 ### Jawab :
 
+ Buatlah status Agmal dan Iraj.
+ 
+	int agmal_wakeup_status = 0;
+	int iraj_spirit_status = 100;
+	
+
+Jika program mendapatkan input "All status", maka status Agmal dan Iraj akan ditampilkan.
+ 	
+	while(1){
+	...
+ 	scanf("%[^\n]s", system_call);
+	...
+	else if(strcmp(system_call, "All Status")==0)
+            {
+                printf("Agmal Wakeup_Status = %d\n", agmal_wakeup_status);
+                printf("Iraj Spirit_Status = %d\n", iraj_spirit_status);
+	    }
+
+Jika mendapatkan input “Agmal Ayo Bangun”, WakeUp_Status Agmal akan ditambah sebesar 15 point. Jika WakeUp_Status Agmal >= 100, program akan menampilkan “Agmal Terbangun,mereka bangun pagi dan berolahraga” kemudian berhenti.
+
+            else if(strcmp(system_call, "Agmal Ayo Bangun")==0)
+                {
+                    agmal_wakeup_status+=15;
+                    if(agmal_wakeup_status>=100)
+                    {
+                        printf("Agmal Terbangun,mereka bangun pagi dan berolahraga\n");
+                        flag=0;
+                    }
+                    count_agmal++;			// counter fitur "Agmal Ayo Bangun" digunakan
+                }
+	      }
+
+Jika mendapatkan input “Iraj Ayo Tidur”, Spirit_Status Iraj akan dikurang sebesar 20 point. Jika Spirit_Status Iraj <= 0, program akan menampilkan “Iraj ikut tidur, dan bangun kesiangan bersama Agmal” kemudian berhenti.
+
+            else if(strcmp(system_call, "Iraj Ayo Tidur")==0)
+            {
+                if(tidur_iraj==1)
+                {
+                    iraj_spirit_status-=20;
+                    if(iraj_spirit_status<=0)
+                    {
+                        printf("Iraj ikut tidur, dan bangun kesiangan bersama Agmal\n");
+                        flag=0;
+                    }
+                    count_iraj++;			// counter fitur "Iraj Ayo Tidur" digunakan
+                }
+}
+
+Thread digunakan untuk menonaktifkan fitur "Agmal Ayo Bangun" atau “Iraj Ayo Tidur” selama 10 detik jika fitur lawanya dilakukan 3 kali.
+
+	
+	 if(count_iraj==3)					// jika fitur “Iraj Ayo Tidur” dilakukan 3 kali
+         {
+             printf("Agmal Ayo Bangun disabled 10 s\n");
+             bangun_agmal=0;
+	  }
+	...
+	void *order_agmal(void *arg)
+	{
+	    while(1)
+	    {
+		if(bangun_agmal==0)			// fitur "Agmal Ayo Bangun" dinonaktifkan selama 10 detik
+		{
+		    sleep(10);				
+		    bangun_agmal=1;			// fitur "Agmal Ayo Bangun" aktifkan kembali
+		    count_iraj=0;			// reset counter fitur “Iraj Ayo Tidur” 
+		}
+	    }
+	}
+	
+
 
 
 ## soal 4 
